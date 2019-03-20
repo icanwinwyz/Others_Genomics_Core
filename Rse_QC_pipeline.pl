@@ -354,6 +354,7 @@ if ($bam){
 	}
 	close JUNK_RNA;
 
+system("Rscript /common/genomics-core/apps/mapping_qc_auto/junkRNA_muti.R $mapped $prefix");
 
 ###########this is to calculate CDS, UTR and Intron########
 	my $total_tag = 0;

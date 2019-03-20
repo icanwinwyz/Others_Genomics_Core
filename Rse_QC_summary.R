@@ -93,7 +93,7 @@ junk_RNA<-data.frame(samples=junk_RNA[,1],sapply(junk_RNA[,2:ncol(junk_RNA)], FU
 junk_RNA$other<-100-rowSums(junk_RNA[,2:ncol(junk_RNA)])
 junk_RNA_format<-ddply(melt(junk_RNA, id.vars = 'samples'), .(samples), mutate, prop = value / sum(value))
 colnames(junk_RNA_format)[2:4]<-c("RNA","value","Percentage")
-pdf("all_samples_reads_dist_single_end.pdf",16,13)
+pdf("all_samples_reads_dist_single_end.pdf")
 print(ggplot(cal_total,aes(x=samples,y=total))+geom_bar(stat="identity",fill="lightblue")+scale_y_continuous(label=million_label)+theme_bw()+xlab("samples")+ylab("total#reads")+theme(axis.text.x=element_text(angle=90,hjust=1,vjust=1)))
 print(ggplot(cal_format, aes(x = samples, y = prop, fill = variable))+ theme_bw() +theme(panel.grid.major = element_blank())+geom_bar(stat = 'identity',width = 0.5)+scale_y_continuous(labels = percent_format())+coord_equal(1/0.2)+scale_fill_manual(values=c("royalblue1","orange","indianred1"))+ coord_flip()+xlab("")+ylab("")+guides(fill=guide_legend(title=NULL)))
 print(ggplot(try_format, aes(x = samples, y = Percentage, fill = Features))+ theme_bw() +theme(panel.grid.major = element_blank())+geom_bar(stat = 'identity',width = 0.5)+scale_y_continuous(labels = percent_format())+coord_equal(1/0.2)+scale_fill_manual(values=c("darkgoldenrod1","gray45","lightskyblue","orchid"))+ coord_flip()+xlab("")+ylab("")+guides(fill=guide_legend(title=NULL)))

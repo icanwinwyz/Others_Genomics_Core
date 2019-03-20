@@ -16,11 +16,7 @@ densematrix<-as.matrix(exprs(gbm_log))
 densematrix_raw<-as.matrix(exprs(gbm))
 final<-cbind(fData(gbm_log)[rownames(densematrix),],densematrix)
 final_raw<-cbind(fData(gbm)[rownames(densematrix_raw),],densematrix_raw)
-
-raw_name<-paste(sample_name,"Expr_raw.csv",sep="_")
-norm_name<-paste(sample_name,"Expr_norm.csv",sep="_")
-
-write.csv(final,paste(cellranger_pipestance_path,norm_name,sep="/"),quote=F,row.names = FALSE)
+write.csv(final,paste(sample_name,"Expr_norm.csv",sep="_"),quote=F,row.names = FALSE)
+write.csv(final_raw,paste(sample_name,"Expr_raw.csv",sep="_"),quote = F,row.names = FALSE)
 	
 #	write.table(final,"NN1_TN1_expr_log_norm.txt",quote = F,sep="\t",row=F)
-write.csv(final_raw,paste(cellranger_pipestance_path,raw_name,sep="/"),quote = F,row.names = FALSE)
