@@ -5,9 +5,6 @@ use JSON;
 use Encode;
 use Data::Dumper;
 
-
-
-
 my $file = $ARGV[0];
 my $fastq_path = $ARGV[1]; 
 my $proj_ID = $ARGV[2];
@@ -75,21 +72,61 @@ print OUT "\n";
 print OUT "you can use this path to perform mapping and QC next.\n\n";
 
 
-if($seq_type eq "NovaSeq"){
-	print OUT "Sample_Name\tReads_Yield\n";
-	my $json_file = $ARGV[4];
-	my $context;
-	open TXT, $json_file or die "Can't open $json_file!\n";
-	while (<TXT>) {
-		$context .= $_;
-	}
-	close TXT;
-	my $obj=decode_json($context);
-	my $test = ${$obj}{"sample_qc"};
-	foreach my $keys (sort keys %$test){
-	print OUT join("  =   ",$keys,&commify(${$obj}{"sample_qc"}{$keys}->{"all"}{"number_reads"})),"\n";
+my $json_file = $ARGV[4];
+my $context;
+open TXT, $json_file or die "Can't open $json_file!\n";
+while (<TXT>) {
+      $context .= $_;
+}
+close TXT;
+my $obj=decode_json($context);
+
+#my $test = ${$obj}{"ConversionResults"}->[0]->{"DemuxResults"}->[0]->{"SampleName"};
+my $test = ${$obj}{"ConversionResults"}->[0]->{"DemuxResults"};
+my $test1 = ${$obj}{"ConversionResults"};
+
+my %sample_count;
+
+foreach my $line (@$test){
+	$sample_count{$line->{"SampleName"}}=0;
+}
+
+
+foreach my $number (@$test1){
+	my $test = $number->{"DemuxResults"};
+	foreach my $line (@$test){
+		$sample_count{$line->{"SampleName"}}=$sample_count{$line->{"SampleName"}}+$line->{"NumberReads"};
+#		print $line->{"SampleName"},"\n";
+#		print $line->{"NumberReads"},"\n";
 	}
 }
+
+print OUT join("\t","Sample","Reads_yield"),"\n";
+
+foreach my $key (keys %sample_count){
+	print OUT join(" = ",$key,commify($sample_count{$key})),"\n";
+}
+
+#print Dumper \@test;
+
+print OUT "\n\n";
+
+my$unde=${$obj}{"UnknownBarcodes"};
+
+print OUT "Index in Undetermined Reads (>1M):\n";
+foreach my $line(@$unde){
+        my $number=$line->{"Lane"};
+        my $temp=$line->{"Barcodes"};
+        print OUT join("","Lane",$number),"\n";
+        foreach my $cal(keys %$temp){
+                if($$temp{$cal} > 1000000){
+                        print OUT join(" = ",$cal,commify($$temp{$cal})),"\n\n";
+                }
+        }
+}
+
+
+
 sub commify {
     my $text = reverse $_[0];
     $text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
@@ -97,20 +134,3 @@ sub commify {
 }
 
 
-__END__
-sub commify {
-	my $num  = shift;
-#	my ($num_l,$num_r) = split /\./, $num;
-	$num_l =~ s/(?<=\d)(?=(\d{3})+$)/,/g;
-#    	my $tmp = reverse $num_r;
-    	$tmp =~ s/(?<=\d)(?=(\d{3})+$)/,/g;
-	$num_r = reverse $tmp;
-	return ($num_r eq "") ? $num_l : sprintf("%s.%s",$num_l,$num_r);
-}
-#print $cmd,"\n";
-
-#my @number = system($cmd);
-
-
-#foreach my $line (@data){
-	

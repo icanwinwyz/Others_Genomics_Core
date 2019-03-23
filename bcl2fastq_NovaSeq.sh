@@ -28,19 +28,20 @@ chmod 775 $2
 cd $2
 
 
-bcl2fastq -R $SEQ_PATH/$2 -o $FOLDER_PATH/$2 -p 30 --ignore-missing-bcl --no-lane-splitting --ignore-missing-filter
+#bcl2fastq -R $SEQ_PATH/$2 -o $FOLDER_PATH/$2 -p 30 --ignore-missing-bcl --no-lane-splitting --ignore-missing-filter
 
 if [ "$1" = "NovaSeq" ]; then
 
-	/usr/bin/perl /home/genomics/bin/bcl_summary_mail.pl $FOLDER_PATH/$2/Stats/DemultiplexingStats.xml $FOLDER_PATH/$2/ $2 NovaSeq $FOLDER_PATH/$2/$OUTPUT_FOLDER/outs/qc_summary.json
+	/usr/bin/perl /home/genomics/bin/bcl_summary_mail.pl $FOLDER_PATH/$2/Stats/DemultiplexingStats.xml $FOLDER_PATH/$2/ $2 NovaSeq $FOLDER_PATH/$2/Stats/Stats.json
 
 	sendmail -vt < ./mail.txt
 	
 #	chmod -R 775 $FOLDER_PATH/$2
 	
 #	chown genomics -R $FOLDER_PATH/$2
-	
-	rm mail.txt
+	/home/genomics/bin/change_per.sh $FOLDER_PATH/$2
+
+#	rm mail.txt
 
 elif [ "$1" = "NextSeq" ]; then
 
@@ -50,26 +51,30 @@ elif [ "$1" = "NextSeq" ]; then
 
 	mv ./Data_processing/Undetermined* ./
 
-	chmod -R 775 $FOLDER_PATH/$2
+#	chmod -R 775 $FOLDER_PATH/$2
 
-	chown genomics -R $FOLDER_PATH/$2	
+#	chown genomics -R $FOLDER_PATH/$2	
 
-	/usr/bin/perl /home/genomics/bin/bcl_summary_mail.pl $FOLDER_PATH/$2/Stats/DemultiplexingStats.xml $FOLDER_PATH/$2/Data_processing $2 NextSeq
+	/usr/bin/perl /home/genomics/bin/bcl_summary_mail.pl $FOLDER_PATH/$2/Stats/DemultiplexingStats.xml $FOLDER_PATH/$2/Data_processing $2 NextSeq $FOLDER_PATH/$2/Stats/Stats.json
 #echo "Subject: the fastq generation for $1 is done!" | sendmail -v yizhou.wang@cshs.org
 	sendmail -vt < ./mail.txt
 
-	rm mail.txt
+	/home/genomics/bin/change_per.sh $FOLDER_PATH/$2
+
+#	rm mail.txt
 
 elif [ "$1" = "MiSeq" ]; then
 
-	/usr/bin/perl /home/genomics/bin/bcl_summary_mail.pl $FOLDER_PATH/$2/Stats/DemultiplexingStats.xml $FOLDER_PATH/$2/ $2 MiSeq
+	/usr/bin/perl /home/genomics/bin/bcl_summary_mail.pl $FOLDER_PATH/$2/Stats/DemultiplexingStats.xml $FOLDER_PATH/$2/ $2 MiSeq $FOLDER_PATH/$2/Stats/Stats.json
 
         sendmail -vt < ./mail.txt
-	
-	chmod -R 775 $FOLDER_PATH/$2
 
-	chown genomics -R $FOLDER_PATH/$2
+	/home/genomics/bin/change_per.sh $FOLDER_PATH/$2
 
-        rm mail.txt
+#	chmod -R 775 $FOLDER_PATH/$2
+
+#	chown genomics -R $FOLDER_PATH/$2
+
+#        rm mail.txt
 
 fi
